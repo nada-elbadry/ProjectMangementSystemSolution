@@ -47,5 +47,6 @@ namespace GymMangementDAL.Repositories.Classes
             _dbContext.Members.Update(member);
             return _dbContext.SaveChanges();
         }
+        /////////////////////يارب انا تعبت 
     }
 }
