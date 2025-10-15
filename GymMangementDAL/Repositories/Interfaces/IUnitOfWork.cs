@@ -4,15 +4,11 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-
 namespace GymMangementDAL.Repositories.Interfaces
 {
-    public interface IPlanRepository
+    public interface IUnitOfWork
     {
-        IEnumerable<Plan> GetAll();
-        Plan? GetById(int id);
-       // int Add(Plan plan);
-        int Update(Plan plan);
-        //int Delete(int id);
+        IGenaricRepository<TEntity> GetRepository<TEntity>() where TEntity : BaseEntity, new();
+        int SaveChanges();
     }
 }

@@ -1,3 +1,5 @@
+using GymMangementBLL.Services.Classes;
+using GymMangementBLL.Services.Interfaces;
 using GymMangementDAL.Data.Contexts;
 using GymMangementDAL.Repositories.Classes;
 using GymMangementDAL.Repositories.Interfaces;
@@ -21,10 +23,16 @@ namespace ProjectMangementPL
             });
             //builder.Services.AddScoped<ITrainerRepository,TrainerRepository>();
             //builder.Services.AddScoped<ISessionRepository, SessionRepository>();
-            builder.Services.AddScoped<IPlanRepository, PlanRepository>();
+           // builder.Services.AddScoped<IPlanRepository, PlanRepository>();
 
-           builder.Services.AddScoped(typeof(IGenaricRepository<>) , typeof(GenaricRepository<>));
-            builder.Services.AddScoped<IPlanRepository, PlanRepository>();
+           //builder.Services.AddScoped(typeof(IGenaricRepository<>) , typeof(GenaricRepository<>));
+           // builder.Services.AddScoped<IPlanRepository, PlanRepository>();
+
+            builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
+            // after builder.Services.AddDbContext...
+            builder.Services.AddScoped<UnitOfWork>(); // or builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
+            builder.Services.AddScoped<ITrainerService, TrainerService>();
+
             var app = builder.Build();
 
             // Configure the HTTP request pipeline.
