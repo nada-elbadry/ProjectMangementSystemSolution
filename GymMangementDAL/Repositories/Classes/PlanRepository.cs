@@ -18,21 +18,17 @@ namespace GymMangementDAL.Repositories.Classes
             _dbContext = dbContext;
         }
 
-        public IEnumerable<Plan> GetAll()
-        {
-            return _dbContext.Plans.ToList();
-        }
+        public IEnumerable<Plan> GetAll()=> _dbContext.Plans.ToList();
+     
 
-        public Plan? GetById(int id)
-        {
-            return _dbContext.Plans.Find(id);
-        }
+        public Plan? GetById(int id)=> _dbContext.Plans.Find(id);
+        
 
-        public int Add(Plan plan)
-        {
-            _dbContext.Plans.Add(plan);
-            return _dbContext.SaveChanges();
-        }
+        //public int Add(Plan plan)
+        //{
+        //    _dbContext.Plans.Add(plan);
+        //    return _dbContext.SaveChanges();
+        //}
 
         public int Update(Plan plan)
         {
@@ -40,13 +36,13 @@ namespace GymMangementDAL.Repositories.Classes
             return _dbContext.SaveChanges();
         }
 
-        public int Delete(int id)
-        {
-            var plan = _dbContext.Plans.Find(id);
-            if (plan == null) return 0;
+        //public int Delete(int id)
+        //{
+        //    var plan = _dbContext.Plans.Find(id);
+        //    if (plan == null) return 0;
 
-            _dbContext.Plans.Remove(plan);
-            return _dbContext.SaveChanges();
-        }
+        //    _dbContext.Plans.Remove(plan);
+        //    return _dbContext.SaveChanges();
+        //}
     }
 }

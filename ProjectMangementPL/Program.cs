@@ -19,10 +19,12 @@ namespace ProjectMangementPL
                 //options.UseSqlServer(builder.Configuration["ConnectionStrings: DefaultConnection"]);
                 options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection") ?? throw new InvalidOperationException("Connection string 'DefaultConnection' not found."));
             });
-            builder.Services.AddScoped<ITrainerRepository,TrainerRepository>();
-            builder.Services.AddScoped<ISessionRepository, SessionRepository>();
+            //builder.Services.AddScoped<ITrainerRepository,TrainerRepository>();
+            //builder.Services.AddScoped<ISessionRepository, SessionRepository>();
             builder.Services.AddScoped<IPlanRepository, PlanRepository>();
 
+           builder.Services.AddScoped(typeof(IGenaricRepository<>) , typeof(GenaricRepository<>));
+            builder.Services.AddScoped<IPlanRepository, PlanRepository>();
             var app = builder.Build();
 
             // Configure the HTTP request pipeline.
