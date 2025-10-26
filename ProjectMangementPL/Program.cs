@@ -1,4 +1,6 @@
+using GymMangementBLL;
 using GymMangementDAL.Data.Contexts;
+using GymMangementDAL.Data.DataSeed;
 using GymMangementDAL.Repositories.Classes;
 using GymMangementDAL.Repositories.Interfaces;
 using Microsoft.EntityFrameworkCore;
@@ -14,16 +16,27 @@ namespace ProjectMangementPL
             builder.Services.AddControllersWithViews();
             builder.Services.AddDbContext<GymDbContext>(options =>
             {
-               
-                //options.UseSqlServer(builder.Configuration.GetSection("ConnectionStrings")["DefaultConnection"]);
-                //options.UseSqlServer(builder.Configuration["ConnectionStrings: DefaultConnection"]);
+              
                 options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection") ?? throw new InvalidOperationException("Connection string 'DefaultConnection' not found."));
             });
-            builder.Services.AddScoped<ITrainerRepository,TrainerRepository>();
+            //builder.Services.AddScoped<ITrainerRepository,TrainerRepository>();
+            //builder.Services.AddScoped<ISessionRepository, SessionRepository>();
+            //builder.Services.AddScoped(typrof(<IGenaricRepository<>),typeof(GenaricRepository<>));
+            builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
             builder.Services.AddScoped<ISessionRepository, SessionRepository>();
-            builder.Services.AddScoped<IPlanRepository, PlanRepository>();
+            builder.Services.AddAutoMapper(X=>X.AddProfile(new MappingProfile()));
 
             var app = builder.Build();
+
+            #region   Migrate Database Data Seeding
+            using var Scope = app.Services.CreateScope();
+            var dbContext = Scope.ServiceProvider.GetRequiredService<GymDbContext>();
+            var PendingMigrations = dbContext.Database.GetPendingMigrations();
+            if(PendingMigrations?.Any()?? false)
+                dbContext.Database.Migrate();
+            GymDbContextSeeding.SeedData(dbContext);
+
+            #endregion
 
             // Configure the HTTP request pipeline.
             if (!app.Environment.IsDevelopment())

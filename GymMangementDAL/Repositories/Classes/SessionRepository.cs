@@ -1,6 +1,7 @@
 ﻿using GymMangementDAL.Data.Contexts;
 using GymMangementDAL.Entities;
 using GymMangementDAL.Repositories.Interfaces;
+using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -9,44 +10,33 @@ using System.Threading.Tasks;
 
 namespace GymMangementDAL.Repositories.Classes
 {
-    public class SessionRepository : ISessionRepository
+    public class SessionRepository : GenaricRepository<Session>, ISessionRepository
     {
         private readonly GymDbContext _dbContext;
 
-        public SessionRepository(GymDbContext dbContext)
+        public SessionRepository(GymDbContext dbContext) :base(dbContext)
         {
             _dbContext = dbContext;
         }
-
-        public IEnumerable<Session> GetAll()
+        public IEnumerable<Session> GetAllSessionWithTrainerAndCategory()
         {
-            return _dbContext.Sessions.ToList();
+            return _dbContext.Sessions.Include(x => x.Trainer)
+                 .Include(x => x.Category)
+                 .ToList();
+                
         }
 
-        public Session? GetById(int id)
+        public int GetCountOfBookedSlots(int sessionId)
         {
-            return _dbContext.Sessions.Find(id);
+            return _dbContext.MemberSessions.Count(x => x.SessionId == sessionId);
         }
 
-        public int Add(Session session)
+        public Session? GetSessionWithTrainerAndCategory(int sessionId)
         {
-            _dbContext.Sessions.Add(session);
-            return _dbContext.SaveChanges();
-        }
-
-        public int Update(Session session)
-        {
-            _dbContext.Sessions.Update(session);
-            return _dbContext.SaveChanges();
-        }
-
-        public int Delete(int id)
-        {
-            var session = _dbContext.Sessions.Find(id);
-            if (session == null) return 0;
-
-            _dbContext.Sessions.Remove(session);
-            return _dbContext.SaveChanges();
+            return _dbContext.Sessions
+                .Include(x => x.Trainer)
+                .Include(x => x.Category)
+                .FirstOrDefault(x => x.Id == sessionId);
         }
     }
 }
