@@ -6,7 +6,9 @@ namespace ProjectMangementPL.Controllers
 {
     public class HomeController : Controller
     {
-        public ViewResult Index()
+        //BaseURL/Home/ Index 
+        [NonAction ]
+        public IActionResult Index()
         {
             return View();
         }

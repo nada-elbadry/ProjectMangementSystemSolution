@@ -13,12 +13,12 @@ using System.Threading.Tasks;
 
 namespace GymMangementBLL.Services.Classes
 {
-    public class SessionService11 : ISessionService
+    public class SessionService: ISessionService
     {
         private readonly IUnitOfWork _unitOfWork;
         private readonly IMapper _mapper;
 
-        public SessionService11(IUnitOfWork unitOfWork , IMapper mapper)
+        public SessionService(IUnitOfWork unitOfWork , IMapper mapper)
         {
             _unitOfWork = unitOfWork;
             _mapper = mapper;
@@ -54,6 +54,7 @@ namespace GymMangementBLL.Services.Classes
         public IEnumerable<SessionViewModel> GetAllSessions()
         {
             var Sessions = _unitOfWork.SessionRepository.GetAllSessionWithTrainerAndCategory();
+          //var Sessions = _unitOfWork.GetRepository<Session>().GetAll();
             if (!Sessions.Any()) return [];
             /*
             //return Sessions.Select(s => new SessionViewModel
@@ -119,11 +120,16 @@ namespace GymMangementBLL.Services.Classes
         {
             try
             {
+
                 var Session = _unitOfWork.SessionRepository.GetById(sessionId);
+                if (!IsSessionAvailableForRemoving(Session!)) return false;
+                _unitOfWork.SessionRepository.Delete(Session!);
+                return _unitOfWork.SaveChanges() > 0;
             }
             catch(Exception ex)
             {
                 Console.WriteLine($"Remove Session Failed : {ex}");
+                return false;
             }
         }
 
@@ -142,13 +148,13 @@ namespace GymMangementBLL.Services.Classes
              return true;
         }
 
-        private bool IsSessionAvailableForDeleting(Session session)
+        private bool IsSessionAvailableForRemoving(Session session)
         {
             if (session is null) return false;
-            // if session completed - no delete allowed
-            if (session.EndDate < DateTime.Now) return false;
+
             //if Session Started - no delete allowed
-            if (session.StartDate <= DateTime.Now) return false;
+            if(session.StartDate<=DateTime.Now&&session.EndDate>DateTime.Now) return false;
+            if (session.StartDate > DateTime.Now) return false;
             //if sessionhas active booking - no delete allowed
             var HasActiveBooking = _unitOfWork.SessionRepository.GetCountOfBookedSlots(session.Id) > 0;
             if (HasActiveBooking) return false;

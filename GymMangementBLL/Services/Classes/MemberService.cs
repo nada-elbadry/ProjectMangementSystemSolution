@@ -48,10 +48,10 @@ namespace GymMangementBLL.Services.Classes
                     },
                     HealthRecord = new HealthRecord()
                     {
-                        Height = createMember.HealthRecordViewModel.Height,
-                        Weight = createMember.HealthRecordViewModel.Weight,
-                        BloodType = createMember.HealthRecordViewModel.BloodType,
-                        Note = createMember.HealthRecordViewModel.Note,
+                        Height = 0, // or assign a default value
+                        Width = 0, // or assign a default value
+                        BloodType = string.Empty, // or assign a default value
+                        Note = string.Empty // or assign a default value
                     },
 
                 };
@@ -134,16 +134,15 @@ namespace GymMangementBLL.Services.Classes
 
         public HealthRecordViewModel? GetMemberHealthRecordDetails(int MemberId)
         {
-            
-                var MemberHealthRecord = _unitOfWork.GetRepository<HealthRecord>().GetById(MemberId);
-                if (MemberHealthRecord is null) return null;
-                return new HealthRecordViewModel()
-                {
-                    Height = MemberHealthRecord.Height,
-                    Weight = MemberHealthRecord.Weight,
-                    BloodType = MemberHealthRecord.BloodType,
-                    Note = MemberHealthRecord.Note
-                };
+            var MemberHealthRecord = _unitOfWork.GetRepository<HealthRecord>().GetById(MemberId);
+            if (MemberHealthRecord is null) return null;
+            return new HealthRecordViewModel()
+            {
+                Height = MemberHealthRecord.Height,
+                Weight = MemberHealthRecord.Width, // Fixed: Use Width instead of Weight
+                BloodType = MemberHealthRecord.BloodType,
+                Note = MemberHealthRecord.Note
+            };
         }
 
         public bool UpdateMemberDetails(int MemberId, MemberToUpdateViewModel UpdatedMember)

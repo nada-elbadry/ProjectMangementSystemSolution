@@ -21,8 +21,8 @@ namespace GymMangementDAL.Repositories.Classes
         public IEnumerable<Session> GetAllSessionWithTrainerAndCategory()
         {
             return _dbContext.Sessions.Include(x => x.Trainer)
-                 .Include(x => x.Category)
-                 .ToList();
+                                        .Include(x => x.Category)
+                                        .ToList();
                 
         }
 
@@ -33,10 +33,9 @@ namespace GymMangementDAL.Repositories.Classes
 
         public Session? GetSessionWithTrainerAndCategory(int sessionId)
         {
-            return _dbContext.Sessions
-                .Include(x => x.Trainer)
-                .Include(x => x.Category)
-                .FirstOrDefault(x => x.Id == sessionId);
+            return _dbContext.Sessions.Include(x => x.Trainer)
+                                      .Include(x => x.Category)
+                                      .FirstOrDefault(x => x.Id == sessionId);
         }
     }
 }

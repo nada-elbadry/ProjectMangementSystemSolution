@@ -16,6 +16,7 @@ namespace GymMangementBLL.ViewModels.SessionViewModels
         public DateTime EndDate { get; set; }
         public int Capacity { get; set; }
         public int AvailableSlots { get; set; }
+
         #region Computed Properties
         public string DateDisplay => $"{StartDate:MMM dd , yyyy}";
 
