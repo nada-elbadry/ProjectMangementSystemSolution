@@ -17,7 +17,8 @@ namespace ProjectMangementPL
             builder.Services.AddDbContext<GymDbContext>(options =>
             {
 
-                options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection") ?? throw new InvalidOperationException("Connection string 'DefaultConnection' not found."));
+                //        options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection") ?? throw new InvalidOperationException("Connection string 'DefaultConnection' not found."));
+                options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection"));
             });
             //builder.Services.AddScoped<ITrainerRepository,TrainerRepository>();
             //builder.Services.AddScoped<ISessionRepository, SessionRepository>();
@@ -30,10 +31,10 @@ namespace ProjectMangementPL
 
             #region   Migrate Database Data Seeding
 
-            using var Scope = app.Services.CreateScope();
-            var dbContext = Scope.ServiceProvider.GetRequiredService<GymDbContext>();
-            var PendingMigrations = dbContext.Database.GetPendingMigrations();
-            if(PendingMigrations?.Any()?? false)
+            using var Scoped = app.Services.CreateScope();
+            var dbContext = Scoped.ServiceProvider.GetRequiredService<GymDbContext>();
+            var PendingMigartions = dbContext.Database.GetPendingMigrations();
+            if (PendingMigartions?.Any() ?? false)
                 dbContext.Database.Migrate();
             GymDbContextSeeding.SeedData(dbContext);
 

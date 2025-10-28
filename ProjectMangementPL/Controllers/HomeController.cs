@@ -13,27 +13,40 @@ namespace ProjectMangementPL.Controllers
             return View();
         }
 
-        public JsonResult Trainers()
-        {
-            var Trainers = new[]
-            {
-                new { Name = "Alice Johnson", Expertise = "Project Management" },
-                new { Name = "Bob Smith", Expertise = "Agile Methodologies" },
-                new { Name = "Charlie Brown", Expertise = "Risk Management" }
-            };
-            return Json(Trainers);
-        }
+       // public JsonResult Trainers()
+       // {
+       //     var Trainers = new[]
+       //     {
+       //         new { Name = "Alice Johnson", Expertise = "Project Management" },
+       //         new { Name = "Bob Smith", Expertise = "Agile Methodologies" },
+       //         new { Name = "Charlie Brown", Expertise = "Risk Management" }
+       //     };
+       //     return Json(Trainers);
+       // }
 
-        public RedirectResult Redirect()
-        {  
-           return Redirect("https://www.example.com");
-        }
+       // public RedirectResult Redirect()
+       // {  
+       //    return Redirect("https://www.teach-anything.com/");
+       // }
 
-        public ContentResult Content()
-        {
-            return Content("<h1>Welcome to the Gym Management Platform!</h1>","text/html");
-        }
+       // public ContentResult Content()
+       // {
+       //     return Content("<h1>Welcome to the Gym Management Platform!</h1>","text/html");
+       // }
 
+       // public FileResult DownLoadFile()
+       // {
+        
+       // var FilePath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot","css","site.css");
 
+       //     var FileBytes = System.IO.File.ReadAllBytes(FilePath);
+       //     return File(FileBytes,"text/css","DownLoadableSite.css");
+
+       // }
+
+       //public EmptyResult EmptyAction()
+       // {
+       //     return new EmptyResult();
+       // }
     }
 }
