@@ -7,12 +7,12 @@ namespace ProjectMangementPL.Controllers
     public class HomeController : Controller
     {
         //BaseURL/Home/ Index 
-        [NonAction ]
+        //[NonAction ]
         public IActionResult Index()
         {
             return View();
         }
-
+        /*
        // public JsonResult Trainers()
        // {
        //     var Trainers = new[]
@@ -48,5 +48,6 @@ namespace ProjectMangementPL.Controllers
        // {
        //     return new EmptyResult();
        // }
+        */
     }
 }
