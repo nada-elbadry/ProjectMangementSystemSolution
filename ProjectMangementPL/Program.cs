@@ -1,4 +1,6 @@
 using GymMangementBLL;
+using GymMangementBLL.Services.Classes;
+using GymMangementBLL.Services.Interfaces;
 using GymMangementDAL.Data.Contexts;
 using GymMangementDAL.Data.DataSeed;
 using GymMangementDAL.Repositories.Classes;
@@ -26,7 +28,7 @@ namespace ProjectMangementPL
             builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
             builder.Services.AddScoped<ISessionRepository, SessionRepository>();
             builder.Services.AddAutoMapper(X=>X.AddProfile(new MappingProfile()));
-
+            builder.Services.AddScoped<IAnalyticsService, AnalyticsService>();
             var app = builder.Build();
 
             #region   Migrate Database Data Seeding
@@ -54,6 +56,13 @@ namespace ProjectMangementPL
             app.UseAuthorization();
 
             app.MapStaticAssets();
+
+            //app.MapControllerRoute(
+            //    name: "Trainers",
+            //    pattern: "Coach/{action}",
+            //    defaults: new { controller = "Trainer" , action ="Index"}
+            //    );
+            //BaseUrl/Controller/Action/Id
             app.MapControllerRoute(
                 name: "default",
                 pattern: "{controller=Home}/{action=Index}/{id?}")

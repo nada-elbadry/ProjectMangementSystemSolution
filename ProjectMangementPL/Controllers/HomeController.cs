@@ -1,4 +1,5 @@
 using System.Diagnostics;
+using GymMangementBLL.Services.Interfaces;
 using Microsoft.AspNetCore.Mvc;
 using ProjectMangementPL.Models;
 
@@ -6,11 +7,22 @@ namespace ProjectMangementPL.Controllers
 {
     public class HomeController : Controller
     {
+        private readonly IAnalyticsService _analyticsService;
+
+        public HomeController(IAnalyticsService analyticsService)
+        {
+           _analyticsService = analyticsService;
+        }
         //BaseURL/Home/ Index 
         //[NonAction ]
-        public IActionResult Index()
+        public ActionResult Index()
         {
-            return View();
+            var Data = _analyticsService.GetAnalyticsData();
+            // return View();//Return Default [View with Action Name] View For Action
+            //return View();//Return Default View For Action With Passing Model Data
+           // return View("Hamada");//Return Specific View For Action
+           // return View("hamada",Data);//Return Specific View For Action With Passing Model Data
+           return View(Data);
         }
         /*
        // public JsonResult Trainers()
