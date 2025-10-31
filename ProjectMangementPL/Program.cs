@@ -1,4 +1,8 @@
+using GymMangementBLL;
+using GymMangementBLL.Services.Classes;
+using GymMangementBLL.Services.Interfaces;
 using GymMangementDAL.Data.Contexts;
+using GymMangementDAL.Data.DataSeed;
 using GymMangementDAL.Repositories.Classes;
 using GymMangementDAL.Repositories.Interfaces;
 using Microsoft.EntityFrameworkCore;
@@ -14,16 +18,29 @@ namespace ProjectMangementPL
             builder.Services.AddControllersWithViews();
             builder.Services.AddDbContext<GymDbContext>(options =>
             {
-               
-                //options.UseSqlServer(builder.Configuration.GetSection("ConnectionStrings")["DefaultConnection"]);
-                //options.UseSqlServer(builder.Configuration["ConnectionStrings: DefaultConnection"]);
-                options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection") ?? throw new InvalidOperationException("Connection string 'DefaultConnection' not found."));
-            });
-            builder.Services.AddScoped<ITrainerRepository,TrainerRepository>();
-            builder.Services.AddScoped<ISessionRepository, SessionRepository>();
-            builder.Services.AddScoped<IPlanRepository, PlanRepository>();
 
+                //        options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection") ?? throw new InvalidOperationException("Connection string 'DefaultConnection' not found."));
+                options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection"));
+            });
+            //builder.Services.AddScoped<ITrainerRepository,TrainerRepository>();
+            //builder.Services.AddScoped<ISessionRepository, SessionRepository>();
+            //builder.Services.AddScoped(typrof(<IGenaricRepository<>),typeof(GenaricRepository<>));
+            builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
+            builder.Services.AddScoped<ISessionRepository, SessionRepository>();
+            builder.Services.AddAutoMapper(X=>X.AddProfile(new MappingProfile()));
+            builder.Services.AddScoped<IAnalyticsService, AnalyticsService>();
             var app = builder.Build();
+
+            #region   Migrate Database Data Seeding
+
+            using var Scoped = app.Services.CreateScope();
+            var dbContext = Scoped.ServiceProvider.GetRequiredService<GymDbContext>();
+            var PendingMigartions = dbContext.Database.GetPendingMigrations();
+            if (PendingMigartions?.Any() ?? false)
+                dbContext.Database.Migrate();
+            GymDbContextSeeding.SeedData(dbContext);
+
+            #endregion
 
             // Configure the HTTP request pipeline.
             if (!app.Environment.IsDevelopment())
@@ -39,6 +56,13 @@ namespace ProjectMangementPL
             app.UseAuthorization();
 
             app.MapStaticAssets();
+
+            //app.MapControllerRoute(
+            //    name: "Trainers",
+            //    pattern: "Coach/{action}",
+            //    defaults: new { controller = "Trainer" , action ="Index"}
+            //    );
+            //BaseUrl/Controller/Action/Id
             app.MapControllerRoute(
                 name: "default",
                 pattern: "{controller=Home}/{action=Index}/{id?}")

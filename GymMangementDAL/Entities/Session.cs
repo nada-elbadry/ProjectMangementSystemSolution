@@ -16,10 +16,12 @@ namespace GymMangementDAL.Entities
 
         public DateTime EndDate { get; set; }
 
+        public string TrainerName { get; set; } = null!;
+
         #region RelationShips
 
         #region Session - Category
-        public Category SessionCategory { get; set; } = null!;
+        public Category Category { get; set; } = null!;
 
         public int CategoryId { get; set; }
         #endregion
@@ -27,7 +29,7 @@ namespace GymMangementDAL.Entities
         #region Session - Trainer
 
         public int TrainerId { get; set; }
-        public Trainer SessionTrainer { get; set; }= null!;
+        public Trainer Trainer { get; set; }= null!;
         #endregion
 
         #region Session -MemberSession

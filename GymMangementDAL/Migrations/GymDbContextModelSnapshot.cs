@@ -4,19 +4,16 @@ using GymMangementDAL.Data.Contexts;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
-using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
 
-namespace GymMangementDAL.Data.Migrations
+namespace GymMangementDAL.Migrations
 {
     [DbContext(typeof(GymDbContext))]
-    [Migration("20251012102143_InitialCreate")]
-    partial class InitialCreate
+    partial class GymDbContextModelSnapshot : ModelSnapshot
     {
-        /// <inheritdoc />
-        protected override void BuildTargetModel(ModelBuilder modelBuilder)
+        protected override void BuildModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -254,6 +251,10 @@ namespace GymMangementDAL.Data.Migrations
                     b.Property<int>("TrainerId")
                         .HasColumnType("int");
 
+                    b.Property<string>("TrainerName")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<DateTime?>("UpdatedAt")
                         .HasColumnType("datetime2");
 
@@ -413,21 +414,21 @@ namespace GymMangementDAL.Data.Migrations
 
             modelBuilder.Entity("GymMangementDAL.Entities.Session", b =>
                 {
-                    b.HasOne("GymMangementDAL.Entities.Category", "SessionCategory")
+                    b.HasOne("GymMangementDAL.Entities.Category", "Category")
                         .WithMany("Sessions")
                         .HasForeignKey("CategoryId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("GymMangementDAL.Entities.Trainer", "SessionTrainer")
+                    b.HasOne("GymMangementDAL.Entities.Trainer", "Trainer")
                         .WithMany("TrainerSessions")
                         .HasForeignKey("TrainerId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.Navigation("SessionCategory");
+                    b.Navigation("Category");
 
-                    b.Navigation("SessionTrainer");
+                    b.Navigation("Trainer");
                 });
 
             modelBuilder.Entity("GymMangementDAL.Entities.Trainer", b =>
