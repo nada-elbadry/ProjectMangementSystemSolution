@@ -26,13 +26,18 @@ namespace GymMangementBLL.Services.Interfaces
           bool Delete(int id, out string errorMessage);
 
           */
-        bool CreateTrainer(CreateTrainerViewModel createTrainer);
-        UpdateTrainerViewModel? GetTrainerToUpdate(int TrainerId);
-        bool UpdateTrainerDetails(UpdateTrainerViewModel updateTrainer , int trainerId);
+        //bool CreateTrainer(CreateTrainerViewModel createTrainer);
+        //UpdateTrainerViewModel? GetTrainerToUpdate(int TrainerId);
+        //bool UpdateTrainerDetails(UpdateTrainerViewModel updateTrainer , int trainerId);
 
-        bool RemoveTrainer(int TrainerId);
+        //bool RemoveTrainer(int TrainerId);
+        //IEnumerable<TrainerViewModel> GetAllTrainers();
+        //TrainerViewModel? GetTrainerDetails(int TrainerId);
         IEnumerable<TrainerViewModel> GetAllTrainers();
-        TrainerViewModel? GetTrainerDetails(int TrainerId);
-        
+        bool CreateTrainer(CreateTrainerViewModel createdTrainer);
+        TrainerViewModel? GetTrainerDetails(int trainerId);
+        UpdateTrainerViewModel? GetTrainerToUpdate(int trainerId);
+        bool UpdateTrainerDetails(UpdateTrainerViewModel updatedTrainer, int trainerId);
+        bool RemoveTrainer(int trainerId);
     }
 }
