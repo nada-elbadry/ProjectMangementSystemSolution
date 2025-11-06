@@ -8,18 +8,15 @@ using System.Threading.Tasks;
 
 namespace GymMangementBLL.ViewModels.TrainerViewModel
 {
-    public class UpdateTrainerViewModel
+    public class TrainerToUpdateViewModel
     {
-        #region TrainerId
-        [Required(ErrorMessage = "Trainer ID is required.")]
-        [Range(1, int.MaxValue, ErrorMessage = "Invalid Trainer ID.")]
-        public int TrainerId { get; set; }
+        #region Id
+        [Required]
+        public int Id { get; set; }
         #endregion
-
         #region Name
         [Required(ErrorMessage = "Name is required.")]
         [RegularExpression(@"^[a-zA-Z\s]+$", ErrorMessage = "Name can contain only letters and spaces.")]
-        [StringLength(50, MinimumLength = 2, ErrorMessage = "Name must be between 2 and 50 characters.")]
         public string Name { get; set; } = null!;
         #endregion
 
@@ -47,11 +44,13 @@ namespace GymMangementBLL.ViewModels.TrainerViewModel
         public Gender Gender { get; set; }
         #endregion
 
-        #region Address
+        #region BuildingNumber
         [Required(ErrorMessage = "Building number is required.")]
         [Range(1, 10000, ErrorMessage = "Building number must be between 1 and 10000.")]
         public int BuildingNumber { get; set; }
+        #endregion
 
+        #region City
         [Required(ErrorMessage = "City is required.")]
         [StringLength(30, MinimumLength = 2, ErrorMessage = "City name must be between 2 and 30 characters.")]
         [RegularExpression(@"^[a-zA-Z\s]+$", ErrorMessage = "City can contain only letters and spaces.")]

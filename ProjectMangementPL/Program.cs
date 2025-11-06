@@ -29,6 +29,7 @@ namespace ProjectMangementPL
             builder.Services.AddScoped<ISessionRepository, SessionRepository>();
             builder.Services.AddAutoMapper(X=>X.AddProfile(new MappingProfile()));
             builder.Services.AddScoped<IAnalyticsService, AnalyticsService>();
+            builder.Services.AddScoped<IMemberService, MemberService>();
             var app = builder.Build();
 
             #region   Migrate Database Data Seeding
@@ -36,9 +37,9 @@ namespace ProjectMangementPL
             using var Scoped = app.Services.CreateScope();
             var dbContext = Scoped.ServiceProvider.GetRequiredService<GymDbContext>();
             var PendingMigartions = dbContext.Database.GetPendingMigrations();
-            if (PendingMigartions?.Any() ?? false)
-                dbContext.Database.Migrate();
-            GymDbContextSeeding.SeedData(dbContext);
+            //if (PendingMigartions?.Any() ?? false)
+            //    dbContext.Database.Migrate();
+          //  GymDbContextSeeding.SeedData(dbContext);
 
             #endregion
 

@@ -28,7 +28,7 @@ namespace GymMangementBLL
         {
             CreateMap<Session, SessionViewModel>()
                .ForMember(dest => dest.CategoryName, opt => opt.MapFrom(src => src.Category.CategoryName))
-               .ForMember(dest => dest.TrainerName, opt => opt.MapFrom(src => src.TrainerName))
+               .ForMember(dest => dest.TrainerName, opt => opt.MapFrom(src => src.Trainer.Name))
                .ForMember(dest => dest.AvailableSlots, opt => opt.Ignore());
             CreateMap<CreateSessionViewModel, Session>();
             CreateMap<Session, UpdateSessionViewModel>().ReverseMap();
@@ -90,12 +90,12 @@ namespace GymMangementBLL
                     City = src.City
                 }));
             CreateMap<Trainer, TrainerViewModel>();
-            CreateMap<Trainer, UpdateTrainerViewModel>()
+            CreateMap<Trainer, TrainerToUpdateViewModel>()
                 .ForMember(dist => dist.Street, opt => opt.MapFrom(src => src.Address.Street))
                 .ForMember(dist => dist.City, opt => opt.MapFrom(src => src.Address.City))
                 .ForMember(dist => dist.BuildingNumber, opt => opt.MapFrom(src => src.Address.BuildingNumber));
 
-            CreateMap<UpdateTrainerViewModel, Trainer>()
+            CreateMap<TrainerToUpdateViewModel, Trainer>()
             .ForMember(dest => dest.Name, opt => opt.Ignore())
             .AfterMap((src, dest) =>
             {

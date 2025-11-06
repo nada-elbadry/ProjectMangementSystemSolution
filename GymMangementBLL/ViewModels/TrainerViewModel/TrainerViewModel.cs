@@ -16,7 +16,7 @@ namespace GymMangementBLL.ViewModels.TrainerViewModel
 
         public string Phone { get; set; } = null!;
 
-        public string Specialization { get; set; } = null!; // Yoga, CrossFit, etc.
+        public string Specialties { get; set; } = null!; // Yoga, CrossFit, etc.
 
         public string? Gender { get; set; }
 

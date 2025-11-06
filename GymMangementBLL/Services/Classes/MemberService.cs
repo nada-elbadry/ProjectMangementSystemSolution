@@ -1,9 +1,11 @@
 ﻿using AutoMapper;
 using GymMangementBLL.Services.Interfaces;
 using GymMangementBLL.ViewModels.MemberViewModels;
+using GymMangementDAL.Data.Contexts;
 using GymMangementDAL.Entities;
 using GymMangementDAL.Repositories.Classes;
 using GymMangementDAL.Repositories.Interfaces;
+using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -17,29 +19,41 @@ namespace GymMangementBLL.Services.Classes
     public class MemberService : IMemberService
     {
 
-            private readonly IUnitOfWork _uintOfWork;
-            private readonly IMapper _mapper;
+        private readonly IUnitOfWork _uintOfWork;
+        private readonly IMapper _mapper;
 
-            public MemberService(IUnitOfWork unitOfWork, IMapper mapper)
-            {
-                _uintOfWork = unitOfWork;
-                _mapper = mapper;
-            }
-            
+        public MemberService(IUnitOfWork unitOfWork, IMapper mapper)
+        {
+            _uintOfWork = unitOfWork;
+            _mapper = mapper;
+        }
 
-            #region Get All Members
-            public IEnumerable<MemberViewModel> GetAllMbers()
-            {
-                var Members = _uintOfWork.GetRepository<Member>().GetAll();
-                if (Members == null || !Members.Any()) return [];
 
-                var MemberViewModels = _mapper.Map<IEnumerable<MemberViewModel>>(Members);
-                return MemberViewModels;
-            }
+        #region Get All Members
+        //public IEnumerable<MemberViewModel> GetAllMembers()
+        //{
+        //    var Members = _uintOfWork.GetRepository<Member>().GetAll() ?? [];
+        //    if (Members is null || !Members.Any()) return [];
+
+        //    var MemberViewModels = _mapper.Map<IEnumerable<MemberViewModel>>(Members);
+        //    return MemberViewModels;
+        //}
+        public IEnumerable<MemberViewModel> GetAllMembers()
+        {
+
+            var members = _uintOfWork.GetRepository<Member>().GetAll();
+
+            if (members is null || !members.Any())
+                return [];
+
+            var memberViewModels = _mapper.Map<IEnumerable<MemberViewModel>>(members);
+            return memberViewModels;
+        }
+    
         #endregion
 
-           #region Create Member
-           public bool CreateMember(CreatMemberViewModel createMember)
+        #region Create Member
+        public bool CreateMember(CreatMemberViewModel createMember)
             {
                 try
                 {
@@ -104,21 +118,29 @@ namespace GymMangementBLL.Services.Classes
             }
         #endregion
 
-        #region Update Member
+            #region Update Member
         public bool UpdateMemberDetails(int Id, MemberToUpdateViewModel UpdatedMember)
         {
-            //If One Of Them Exists , Return False
-            if (IsEmailExists(UpdatedMember.Email) || IsPhoneExists(UpdatedMember.Phone)) return false;
-            var MemberRepo = _uintOfWork.GetRepository<Member>();
-            var Member = MemberRepo.GetById(Id);
-            if (Member == null) return false;
-            _mapper.Map(UpdatedMember, Member);
-            return _uintOfWork.SaveChanges() > 0;
+            try
+            {
+                //If One Of Them Exists , Return False
+                if (IsEmailExists(UpdatedMember.Email) || IsPhoneExists(UpdatedMember.Phone)) return false;
+                var MemberRepo = _uintOfWork.GetRepository<Member>();
+                var Member = MemberRepo.GetById(Id);
+                if (Member == null) return false;
+                _mapper.Map(UpdatedMember, Member);
+                return _uintOfWork.SaveChanges() > 0;
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Update failed: {ex.Message}");
+                return false;
+            }
         }
-            #endregion
+        #endregion
 
-            #region Remove Member
-            public bool RemoveMember(int MemberId)
+        #region Remove Member
+        public bool RemoveMember(int MemberId)
             {
             var memberRepo = _uintOfWork.GetRepository<Member>();
             var Member = memberRepo.GetById(MemberId);
@@ -191,14 +213,6 @@ namespace GymMangementBLL.Services.Classes
                 return hasActiveMemberSessions;
             }
 
-        public IEnumerable<MemberViewModel> GetAllMembers()
-        {
-            var Members = _uintOfWork.GetRepository<Member>().GetAll() ?? [];
-            if (Members is null || !Members.Any()) return [];
-
-            var MemberViewModels = _mapper.Map<IEnumerable<MemberViewModel>>(Members);
-            return MemberViewModels;
-        }
 
         #endregion
 

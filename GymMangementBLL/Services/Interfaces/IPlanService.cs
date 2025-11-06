@@ -9,15 +9,12 @@ namespace GymMangementBLL.Services.Interfaces
 {
     internal interface IPlanService
     {
-        
 
-        IEnumerable<PlanViewModel>GetAllPlans();
 
-        PlanViewModel? GetPlanById(int PlanId);
-
+        IEnumerable<PlanViewModel> GetAllPlans();
+        PlanViewModel? GetPlanDetails(int PlanId);
         UpdatePlanViewModel? GetPlanToUpdate(int PlanId);
-
-        bool UpdatePlan(int PlanId, UpdatePlanViewModel updatedPlan);
+        bool UpdatePlan(int PlanId, UpdatePlanViewModel UpdatedPlan);
         bool ToggleStatus(int PlanId);
     }
 }
