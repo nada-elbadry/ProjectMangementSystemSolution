@@ -87,8 +87,8 @@ namespace GymMangementBLL.Services.Classes
 
                 if (activeMemberShip is not null)
                 {
-                    viewModel.MembershipStartDate = activeMemberShip.CreatedAt.ToShortDateString();
-                    viewModel.MembershipEndDate = activeMemberShip.EndDate.ToShortDateString();
+                    viewModel.MemberShipStartDate = activeMemberShip.CreatedAt.ToShortDateString();
+                    viewModel.MemberShipEndDate = activeMemberShip.EndDate.ToShortDateString();
                     var plan = _uintOfWork.GetRepository<Plan>().GetById(activeMemberShip.PlanId);
                     viewModel.PlanName = plan?.Name;
                 }

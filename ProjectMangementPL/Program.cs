@@ -12,8 +12,13 @@ namespace ProjectMangementPL
     {
         public static void Main(string[] args)
         {
+            #region  Builder Configuration
+
             var builder = WebApplication.CreateBuilder(args);
 
+            #endregion
+
+            #region  Services Registration
             // Add services to the container.
             builder.Services.AddControllersWithViews();
             builder.Services.AddDbContext<GymDbContext>(options =>
@@ -30,16 +35,24 @@ namespace ProjectMangementPL
             builder.Services.AddAutoMapper(X=>X.AddProfile(new MappingProfile()));
             builder.Services.AddScoped<IAnalyticsService, AnalyticsService>();
             builder.Services.AddScoped<IMemberService, MemberService>();
+            builder.Services.AddScoped<ITrainerService, TrainerService>();
+
+            #endregion
+
+            #region  App Build
+
             var app = builder.Build();
+
+            #endregion
 
             #region   Migrate Database Data Seeding
 
             using var Scoped = app.Services.CreateScope();
             var dbContext = Scoped.ServiceProvider.GetRequiredService<GymDbContext>();
             var PendingMigartions = dbContext.Database.GetPendingMigrations();
-            //if (PendingMigartions?.Any() ?? false)
-            //    dbContext.Database.Migrate();
-          //  GymDbContextSeeding.SeedData(dbContext);
+            if (PendingMigartions?.Any() ?? false)
+                dbContext.Database.Migrate();
+            GymDbContextSeeding.SeedData(dbContext);
 
             #endregion
 
@@ -57,7 +70,7 @@ namespace ProjectMangementPL
             app.UseAuthorization();
 
             app.MapStaticAssets();
-
+            #region  Endpoint Mapping
             //app.MapControllerRoute(
             //    name: "Trainers",
             //    pattern: "Coach/{action}",
@@ -68,8 +81,12 @@ namespace ProjectMangementPL
                 name: "default",
                 pattern: "{controller=Home}/{action=Index}/{id?}")
                 .WithStaticAssets();
+#endregion
 
+            #region  Run Application
+            app.UseStaticFiles();
             app.Run();
+            #endregion
         }
     }
 }

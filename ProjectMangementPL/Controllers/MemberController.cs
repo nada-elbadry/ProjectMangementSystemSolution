@@ -8,12 +8,15 @@ namespace ProjectMangementPL.Controllers
     public class MemberController : Controller
 
     {
+        #region Fields & Constructor
         private readonly IMemberService _memberService;
 
         public MemberController(IMemberService memberService)
         {
             _memberService = memberService;
         }
+        #endregion
+
         #region Get All Member
 
         public ActionResult Index()
@@ -22,43 +25,43 @@ namespace ProjectMangementPL.Controllers
             return View(members);
         }
         #endregion
-        //public IActionResult Index(int id)
-        //{
-        //    return RedirectToRoute("Trainers", new {action ="GetTrainers"});
-        //}
-
-        //public ActionResult GetMembers()
-        //{ 
-        //return View();
-        //}
-        //public ActionResult CreateMember()
-        //{
-        //    return View();
-        //}
 
         #region Get Member Data
         //BaseURL: /Member/MemberDetails-> id =0
         //BaseURL: /Member/MemberDetails/5 -> id =1
         public ActionResult MemberDetails(int id)
-        { 
-            if(id<=0)
+        {
+            if (id <= 0)
+            {
+                TempData["ErrorMessage"] = "Invalid Member Id.";
                 return RedirectToAction(nameof(Index));
-       var member = _memberService.GetMemberDeails(id);
-            if (member is null)
+            }
+            var Member = _memberService.GetMemberDeails(id);
+            if (Member is null)
+            {
+                TempData["ErrorMessage"] = "Member not found.";
                 return RedirectToAction(nameof(Index));
-            return View(member);
+            }
+            return View(Member);
         }
 
         public ActionResult HealthRecordDetails(int id)
         {
             if (id <= 0)
+            {
+                TempData["ErrorMessage"] = "HealthRecord Of Member Not Found";
                 return RedirectToAction(nameof(Index));
+            }
             var healthRecord = _memberService.GetMemberHealthRecordDetails(id);
             if (healthRecord is null)
+            {
+                TempData["ErrorMessage"] = "HealthRecord Of Member Not Found";
                 return RedirectToAction(nameof(Index));
+            }
             return View(healthRecord);
         }
         #endregion
+
         #region Add Member
         public ActionResult Create()
         {
@@ -89,6 +92,7 @@ namespace ProjectMangementPL.Controllers
             }
         }
         #endregion
+
         #region Update Member
         public ActionResult MemberEdit(int id)
         {
@@ -132,8 +136,8 @@ namespace ProjectMangementPL.Controllers
             return RedirectToAction(nameof(Index));
         }
         #endregion
-        #region Delete Member
 
+        #region Delete Member
 
         public ActionResult Delete(int id)
         {

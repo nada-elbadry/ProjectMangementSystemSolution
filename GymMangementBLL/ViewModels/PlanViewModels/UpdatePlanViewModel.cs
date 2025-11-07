@@ -16,6 +16,7 @@ namespace GymMangementBLL.ViewModels.PlanViewModels
         [Required(ErrorMessage = "Description is required")]
         [StringLength(200 ,MinimumLength =50,ErrorMessage = "Description must be between 5 and 200 char ")]
         public string Description { get; set; } = null!;
+
         [Required(ErrorMessage = "Duration is required")]
         [Range(1, 365, ErrorMessage = "Duration Days must be between 1 and 365 days")]
         public int DurationDays { get; set; }
