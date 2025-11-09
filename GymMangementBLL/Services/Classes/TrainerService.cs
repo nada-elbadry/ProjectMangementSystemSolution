@@ -1,6 +1,6 @@
 ﻿using AutoMapper;
 using GymMangementBLL.Services.Interfaces;
-using GymMangementBLL.ViewModels.TrainerViewModel;
+using GymMangementBLL.ViewModels.TrainerViewModels;
 using GymMangementDAL.Entities;
 using GymMangementDAL.Repositories.Classes;
 using GymMangementDAL.Repositories.Interfaces;
@@ -12,7 +12,7 @@ using System.Threading.Tasks;
 
 namespace GymMangementBLL.Services.Classes
 {
-    public class TrainerService : ITrainerService
+    public class TrainerService : ITrainerServices
     {
 
         #region Fields & Constructor

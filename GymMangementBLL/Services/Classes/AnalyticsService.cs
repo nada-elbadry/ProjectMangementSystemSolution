@@ -1,5 +1,5 @@
 ﻿using GymMangementBLL.Services.Interfaces;
-using GymMangementBLL.ViewModels.AnalyticsViewModels;
+using GymMangementBLL.ViewModels.AnalysticsViewModel;
 using GymMangementDAL.Entities;
 using GymMangementDAL.Repositories.Interfaces;
 using System;
@@ -26,7 +26,7 @@ namespace GymMangementBLL.Services.Classes
                 ActiveMembers = _unitOfWork.GetRepository<Membership>().GetAll(x=>x.Status == "Active").Count(),
                 TotalMembers = _unitOfWork.GetRepository<Membership>().GetAll().Count(),
                 TotalTrainers = _unitOfWork.GetRepository<Session>().GetAll().Count(),
-                UpcomingSession= Sessions.Count(x=>x.StartDate> DateTime.Now),
+                UpcomingSessions= Sessions.Count(x => x.StartDate > DateTime.Now),
                 OngoingSessions = Sessions.Count(x=>x.StartDate<=DateTime.Now && x.EndDate>=DateTime.Now),
                 CompletedSessions = Sessions.Count(X => X.EndDate < DateTime.Now),
             };

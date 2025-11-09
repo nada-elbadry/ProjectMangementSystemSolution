@@ -1,5 +1,5 @@
-﻿@using GymMangementBLL.ViewModels.TrainerViewModel
-@model IEnumerable<GymMangementBLL.ViewModels.TrainerViewModel.TrainerViewModel>
+﻿@using GymMangementBLL.ViewModels.TrainerViewModels
+@model IEnumerable<GymMangementBLL.ViewModels.TrainerViewModels.TrainerViewModel> 
 @{
     ViewData["Title"] = "Trainers";
 }
@@ -63,11 +63,10 @@
                             <td class="action position-relative text-end">
                                 @* Align dropdown container to the right *@
                                 <div class="dropdown">
-                                    <!-- Cleaner button style -->
-                                    <button class="btn btn-link p-0 border-0 text-decoration-none" type="button"
-                                            id="dropdownMenuButton-@trainer.Id" data-bs-toggle="dropdown" aria-expanded="false">
-
-                                        <i class="bi bi-three-dots-vertical fs-5 text-secondary"></i> @* Bootstrap icon for dropdown *@
+                                    <button class="btn btn-link p-0 border-0 text-decoration-none" type="button" 
+                                            id="dropdownMenuButton-@trainer.Id" data-bs-toggle="dropdown"
+                                            aria-expanded="false">
+                                        <i class="bi bi-three-dots-vertical fs-5 text-secondary"></i> 
                                     </button>
                                     <ul class="dropdown-menu dropdown-menu-end"
                                         aria-labelledby="dropdownMenuButton-@trainer.Id">
@@ -115,32 +114,5 @@
 
 @section Scripts
 {
-    <script>
-        // Script to fade out alerts after 3 seconds
-        document.addEventListener("DOMContentLoaded", function () {
-            // Select both potential alert IDs
-            const alertSuccess = document.getElementById("AlertSuccess");
-            const alertError = document.getElementById("AlertError");
-
-            function fadeOutAlert(alertBox) {
-                if (alertBox) {
-                    setTimeout(() => {
-                        // Use Bootstrap's built-in dismiss method if available
-                        var alertInstance = bootstrap.Alert.getOrCreateInstance(alertBox);
-                        if (alertInstance) {
-                            alertInstance.close();
-                        } else {
-                            // Fallback if Bootstrap JS isn't fully loaded
-                            alertBox.style.transition = "opacity 0.5s ease";
-                            alertBox.style.opacity = "0";
-                            setTimeout(() => alertBox.remove(), 500);
-                        }
-                    }, 3000); // 3 seconds delay
-                }
-            }
-
-            fadeOutAlert(alertSuccess);
-            fadeOutAlert(alertError);
-        });
-    </script>
+    <partial name="_AlertBoxScript" />
 }

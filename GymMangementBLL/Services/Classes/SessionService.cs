@@ -24,16 +24,16 @@ namespace GymMangementBLL.Services.Classes
             _mapper = mapper;
         }
 
-        public bool CreateSession(SessionViewModel CreatedSession)
+        public bool CreateSession(CreateSessionViewModel CreatedSession)
         {
             try
             {
 
                 //Check if Trainer is exists
-                if (!IsTrainerExists(CreatedSession.Id))
+                if (!IsTrainerExists(CreatedSession.TrainerId))
                     return false;
                 //Check if Category is exists
-                if (!IsCategoryExists(CreatedSession.Id))
+                if (!IsCategoryExists(CreatedSession.CategoryId))
                     return false;
                 //Check if StartDate is before EndDate
                 if (!IsDateTimeValid(CreatedSession.StartDate, CreatedSession.EndDate))
@@ -132,7 +132,17 @@ namespace GymMangementBLL.Services.Classes
                 return false;
             }
         }
+        public IEnumerable<TrainerSelectViewModel> GetAllTrainersForDropDown()
+        {
+            var Trainers = _unitOfWork.GetRepository<Trainer>().GetAll();
+            return _mapper.Map<IEnumerable<Trainer>, IEnumerable<TrainerSelectViewModel>>(Trainers);
+        }
 
+        public IEnumerable<CategorySelectViewModel> GetAllTCategoriesForDropDown()
+        {
+            var Categories = _unitOfWork.GetRepository<Category>().GetAll();
+            return _mapper.Map<IEnumerable<Category>, IEnumerable<CategorySelectViewModel>>(Categories);
+        }
 
         #region Helper Method
         private bool IsSessionAvailableForUpdating(Session session)
@@ -174,8 +184,6 @@ namespace GymMangementBLL.Services.Classes
         {
             return StartDate < EndDate;
         }
-
-       
 
         #endregion
     }

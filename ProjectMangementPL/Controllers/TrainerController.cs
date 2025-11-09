@@ -1,5 +1,5 @@
 ﻿using GymMangementBLL.Services.Interfaces;
-using GymMangementBLL.ViewModels.TrainerViewModel;
+using GymMangementBLL.ViewModels.TrainerViewModels;
 using Microsoft.AspNetCore.Mvc;
 
 namespace ProjectMangementPL.Controllers
@@ -7,9 +7,9 @@ namespace ProjectMangementPL.Controllers
     public class TrainerController : Controller
     {
         #region Fields & Constructor
-        private readonly ITrainerService _trainerServices;
+        private readonly ITrainerServices _trainerServices;
 
-        public TrainerController(ITrainerService trainerServices)
+        public TrainerController(ITrainerServices trainerServices)
         {
             _trainerServices = trainerServices;
         }

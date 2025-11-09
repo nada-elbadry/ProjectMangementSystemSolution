@@ -6,7 +6,10 @@ using System.Threading.Tasks;
 
 namespace GymMangementBLL.ViewModels.SessionViewModels
 {
-    internal class TrainerSelectViewModel
+    public class TrainerSelectViewModel
     {
+        public int Id { get; set; }
+        public string Name { get; set; } = null!;
+
     }
 }

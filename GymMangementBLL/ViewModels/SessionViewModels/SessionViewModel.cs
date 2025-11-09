@@ -24,7 +24,12 @@ namespace GymMangementBLL.ViewModels.SessionViewModels
         public int AvailableSlots { get; set; }
 
         #region Computed Properties
-        public string DateDisplay => $"{StartDate:hh:mm tt} - {EndDate:hh:mm tt}";
+
+       
+        public string DateDisplay => StartDate.ToString("dd/MM/yyyy");
+
+     
+        public string TimeRangeDisplay => $"{StartDate:hh:mm tt} - {EndDate:hh:mm tt}";
 
         public TimeSpan Duration => EndDate - StartDate;
 
@@ -33,7 +38,7 @@ namespace GymMangementBLL.ViewModels.SessionViewModels
             get
             {
                 if (StartDate > DateTime.Now)
-                    return "Upcomnig";
+                    return "Upcoming";
                 else if (StartDate <= DateTime.Now && EndDate >= DateTime.Now)
                     return "Ongoing";
                 else

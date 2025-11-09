@@ -1,9 +1,9 @@
 ﻿using AutoMapper;
 using GymManagementSystemBLL.ViewModels.SessionViewModels;
 using GymMangementBLL.ViewModels.MemberViewModels;
-using GymMangementBLL.ViewModels.PlanViewModels;
+using GymMangementBLL.ViewModels.PlanViewModel;
 using GymMangementBLL.ViewModels.SessionViewModels;
-using GymMangementBLL.ViewModels.TrainerViewModel;
+using GymMangementBLL.ViewModels.TrainerViewModels;
 using GymMangementDAL.Entities;
 using System;
 using System.Collections.Generic;
@@ -49,7 +49,7 @@ namespace GymMangementBLL
             #region Trainer Mappings (Corrected)
             // CreateTrainerViewModel -> Trainer (Handles Address)
             CreateMap<CreateTrainerViewModel, Trainer>()
-                .ForMember(dest => dest.Address, opt => opt.MapFrom(src => new Address { BuildingNumber = src.BuldingNumber, City = src.City, Street = src.Street }));
+                .ForMember(dest => dest.Address, opt => opt.MapFrom(src => new Address { BuildingNumber = src.BuildingNumber, City = src.City, Street = src.Street }));
 
             // Trainer -> TrainerViewModel (For display)
             CreateMap<Trainer, TrainerViewModel>()

@@ -1,4 +1,4 @@
-﻿using GymMangementBLL.ViewModels.PlanViewModels;
+﻿using GymMangementBLL.ViewModels.PlanViewModel;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace GymMangementBLL.Services.Interfaces
 {
-    internal interface IPlanService
+    public interface IPlanService
     {
 
 
