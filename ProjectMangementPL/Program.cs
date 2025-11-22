@@ -1,10 +1,14 @@
+using GymManagementBLL.Services.Attachment_Service;
 using GymMangementBLL;
+using GymMangementBLL.Services.Attachment_Service;
 using GymMangementBLL.Services.Classes;
 using GymMangementBLL.Services.Interfaces;
 using GymMangementDAL.Data.Contexts;
 using GymMangementDAL.Data.DataSeed;
+using GymMangementDAL.Entities;
 using GymMangementDAL.Repositories.Classes;
 using GymMangementDAL.Repositories.Interfaces;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 namespace ProjectMangementPL
 {
@@ -38,6 +42,28 @@ namespace ProjectMangementPL
             builder.Services.AddScoped<ITrainerServices, TrainerService>();
             builder.Services.AddScoped<IPlanService, PlanService>();
             builder.Services.AddScoped<ISessionService, SessionService>();
+            builder.Services.AddScoped<IAttachmentService, AttachmentService>();
+            #region Login
+            builder.Services.AddScoped<IAccountService, AccountService>();
+            #endregion
+
+            builder.Services.AddIdentity < ApplicationUser ,IdentityRole>(Config=>
+            {
+                //Defult:
+                //Config.Password.RequiredLength = 6;
+                //Config.Password.RequireLowercase = true;
+                //Config.Password.RequireUppercase = true;
+                Config.User.RequireUniqueEmail = true;
+
+            })
+                            .AddEntityFrameworkStores<GymDbContext>();
+
+            builder.Services.ConfigureApplicationCookie(options =>
+            {
+                options.LogoutPath = "/Account/Login";
+                options.AccessDeniedPath = "/Account/AccessDenied";
+            });
+
 
             #endregion
 
@@ -51,10 +77,13 @@ namespace ProjectMangementPL
 
             using var Scoped = app.Services.CreateScope();
             var dbContext = Scoped.ServiceProvider.GetRequiredService<GymDbContext>();
+            var roleManager = Scoped.ServiceProvider.GetRequiredService<RoleManager<IdentityRole>>();
+            var userManger = Scoped.ServiceProvider.GetRequiredService<UserManager<ApplicationUser>>();
             var PendingMigartions = dbContext.Database.GetPendingMigrations();
             if (PendingMigartions?.Any() ?? false)
                 dbContext.Database.Migrate();
             GymDbContextSeeding.SeedData(dbContext);
+            IdentityDbContextSeeding.SeedData(roleManager, userManger);
 
             #endregion
 
@@ -68,7 +97,7 @@ namespace ProjectMangementPL
 
             app.UseHttpsRedirection();
             app.UseRouting();
-
+            app.UseAuthentication();
             app.UseAuthorization();
 
             app.MapStaticAssets();
@@ -81,7 +110,7 @@ namespace ProjectMangementPL
             //BaseUrl/Controller/Action/Id
             app.MapControllerRoute(
                 name: "default",
-                pattern: "{controller=Home}/{action=Index}/{id?}")
+                pattern: "{controller=Account}/{action=Login}/{id?}")
                 .WithStaticAssets();
 #endregion
 

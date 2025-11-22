@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using GymMangementBLL.Services.Attachment_Service;
 using GymMangementBLL.Services.Interfaces;
 using GymMangementBLL.ViewModels.MemberViewModels;
 using GymMangementDAL.Data.Contexts;
@@ -21,11 +22,13 @@ namespace GymMangementBLL.Services.Classes
 
         private readonly IUnitOfWork _uintOfWork;
         private readonly IMapper _mapper;
+        private readonly IAttachmentService _attachmentService;
 
-        public MemberService(IUnitOfWork unitOfWork, IMapper mapper)
+        public MemberService(IUnitOfWork unitOfWork, IMapper mapper, IAttachmentService attachmentService)
         {
             _uintOfWork = unitOfWork;
             _mapper = mapper;
+            _attachmentService = attachmentService;
         }
 
 
@@ -59,17 +62,28 @@ namespace GymMangementBLL.Services.Classes
                 {
                 //If One Of Them Exists , Return False
                 if (IsEmailExists(createMember.Email) || IsPhoneExists(createMember.Phone)) return false;
+                var PhotoName = _attachmentService.Upload("Members",createMember.PhotoFile);   
+                if(string.IsNullOrEmpty(PhotoName)) return false;
                 //If Not Add Member And Return True If Added Successfully
                 var member = _mapper.Map<Member>(createMember);
-
-                    _uintOfWork.GetRepository<Member>().Add(member);
-                    return _uintOfWork.SaveChanges() > 0;
-                }
-                catch (Exception ex)
+                member.Photo = PhotoName;
+                _uintOfWork.GetRepository<Member>().Add(member);
+                    var IsCreated = _uintOfWork.SaveChanges() > 0;
+                if(!IsCreated)
                 {
-                    Console.WriteLine($"Error in CreateMember: {ex.Message}");
-                    throw;
+                    _attachmentService.Delete(PhotoName, "Members");
+                    return false;
                 }
+                else
+                {
+                    return IsCreated;
+                }
+            }
+            catch (Exception ex)
+                    {
+                        Console.WriteLine($"Error in CreateMember: {ex.Message}");
+                        throw;
+                    }
             }
             #endregion
 
@@ -152,20 +166,25 @@ namespace GymMangementBLL.Services.Classes
             var MemberShips = memberShipsRepo.GetAll(x => x.MemberId == MemberId);
 
             try
+            {
+                if (MemberShips.Any())
                 {
-                if(MemberShips.Any())
-                {
-                    foreach(var membership in MemberShips)
+                    foreach (var membership in MemberShips)
                         memberShipsRepo.Delete(membership);
-                    
+
                 }
                 memberRepo.Delete(Member);
-                return _uintOfWork.SaveChanges() > 0;
-                }
-                catch
-                {
-         
-                    return false;
+                var IsDeleted = _uintOfWork.SaveChanges() > 0;
+                if (IsDeleted)
+                    _attachmentService.Delete(Member.Photo, "Members");
+
+                return IsDeleted;
+            }
+
+            catch
+            {
+
+                return false;
             }
             }
             #endregion

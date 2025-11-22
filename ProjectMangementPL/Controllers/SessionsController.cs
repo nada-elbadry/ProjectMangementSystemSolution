@@ -1,10 +1,12 @@
 ﻿using GymManagementSystemBLL.ViewModels.SessionViewModels;
 using GymMangementBLL.Services.Interfaces;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 
 namespace ProjectMangementPL.Controllers
 {
+    [Authorize(Roles = "SuperAdmin")]
     public class SessionsController : Controller
     {
         #region Fields
