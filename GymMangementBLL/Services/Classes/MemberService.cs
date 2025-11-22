@@ -1,9 +1,12 @@
 ﻿using AutoMapper;
+using GymMangementBLL.Services.Attachment_Service;
 using GymMangementBLL.Services.Interfaces;
 using GymMangementBLL.ViewModels.MemberViewModels;
+using GymMangementDAL.Data.Contexts;
 using GymMangementDAL.Entities;
 using GymMangementDAL.Repositories.Classes;
 using GymMangementDAL.Repositories.Interfaces;
+using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -17,45 +20,70 @@ namespace GymMangementBLL.Services.Classes
     public class MemberService : IMemberService
     {
 
-            private readonly IUnitOfWork _uintOfWork;
-            private readonly IMapper _mapper;
+        private readonly IUnitOfWork _uintOfWork;
+        private readonly IMapper _mapper;
+        private readonly IAttachmentService _attachmentService;
 
-            public MemberService(IUnitOfWork unitOfWork, IMapper mapper)
-            {
-                _uintOfWork = unitOfWork;
-                _mapper = mapper;
-            }
-            
+        public MemberService(IUnitOfWork unitOfWork, IMapper mapper, IAttachmentService attachmentService)
+        {
+            _uintOfWork = unitOfWork;
+            _mapper = mapper;
+            _attachmentService = attachmentService;
+        }
 
-            #region Get All Members
-            public IEnumerable<MemberViewModel> GetAllMbers()
-            {
-                var Members = _uintOfWork.GetRepository<Member>().GetAll();
-                if (Members == null || !Members.Any()) return [];
 
-                var MemberViewModels = _mapper.Map<IEnumerable<MemberViewModel>>(Members);
-                return MemberViewModels;
-            }
+        #region Get All Members
+        //public IEnumerable<MemberViewModel> GetAllMembers()
+        //{
+        //    var Members = _uintOfWork.GetRepository<Member>().GetAll() ?? [];
+        //    if (Members is null || !Members.Any()) return [];
+
+        //    var MemberViewModels = _mapper.Map<IEnumerable<MemberViewModel>>(Members);
+        //    return MemberViewModels;
+        //}
+        public IEnumerable<MemberViewModel> GetAllMembers()
+        {
+
+            var members = _uintOfWork.GetRepository<Member>().GetAll();
+
+            if (members is null || !members.Any())
+                return [];
+
+            var memberViewModels = _mapper.Map<IEnumerable<MemberViewModel>>(members);
+            return memberViewModels;
+        }
+    
         #endregion
 
-           #region Create Member
-           public bool CreateMember(CreatMemberViewModel createMember)
+        #region Create Member
+        public bool CreateMember(CreatMemberViewModel createMember)
             {
                 try
                 {
                 //If One Of Them Exists , Return False
                 if (IsEmailExists(createMember.Email) || IsPhoneExists(createMember.Phone)) return false;
+                var PhotoName = _attachmentService.Upload("Members",createMember.PhotoFile);   
+                if(string.IsNullOrEmpty(PhotoName)) return false;
                 //If Not Add Member And Return True If Added Successfully
                 var member = _mapper.Map<Member>(createMember);
-
-                    _uintOfWork.GetRepository<Member>().Add(member);
-                    return _uintOfWork.SaveChanges() > 0;
-                }
-                catch (Exception ex)
+                member.Photo = PhotoName;
+                _uintOfWork.GetRepository<Member>().Add(member);
+                    var IsCreated = _uintOfWork.SaveChanges() > 0;
+                if(!IsCreated)
                 {
-                    Console.WriteLine($"Error in CreateMember: {ex.Message}");
-                    throw;
+                    _attachmentService.Delete(PhotoName, "Members");
+                    return false;
                 }
+                else
+                {
+                    return IsCreated;
+                }
+            }
+            catch (Exception ex)
+                    {
+                        Console.WriteLine($"Error in CreateMember: {ex.Message}");
+                        throw;
+                    }
             }
             #endregion
 
@@ -73,8 +101,8 @@ namespace GymMangementBLL.Services.Classes
 
                 if (activeMemberShip is not null)
                 {
-                    viewModel.MembershipStartDate = activeMemberShip.CreatedAt.ToShortDateString();
-                    viewModel.MembershipEndDate = activeMemberShip.EndDate.ToShortDateString();
+                    viewModel.MemberShipStartDate = activeMemberShip.CreatedAt.ToShortDateString();
+                    viewModel.MemberShipEndDate = activeMemberShip.EndDate.ToShortDateString();
                     var plan = _uintOfWork.GetRepository<Plan>().GetById(activeMemberShip.PlanId);
                     viewModel.PlanName = plan?.Name;
                 }
@@ -104,21 +132,29 @@ namespace GymMangementBLL.Services.Classes
             }
         #endregion
 
-        #region Update Member
+            #region Update Member
         public bool UpdateMemberDetails(int Id, MemberToUpdateViewModel UpdatedMember)
         {
-            //If One Of Them Exists , Return False
-            if (IsEmailExists(UpdatedMember.Email) || IsPhoneExists(UpdatedMember.Phone)) return false;
-            var MemberRepo = _uintOfWork.GetRepository<Member>();
-            var Member = MemberRepo.GetById(Id);
-            if (Member == null) return false;
-            _mapper.Map(UpdatedMember, Member);
-            return _uintOfWork.SaveChanges() > 0;
+            try
+            {
+                //If One Of Them Exists , Return False
+                if (IsEmailExists(UpdatedMember.Email) || IsPhoneExists(UpdatedMember.Phone)) return false;
+                var MemberRepo = _uintOfWork.GetRepository<Member>();
+                var Member = MemberRepo.GetById(Id);
+                if (Member == null) return false;
+                _mapper.Map(UpdatedMember, Member);
+                return _uintOfWork.SaveChanges() > 0;
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Update failed: {ex.Message}");
+                return false;
+            }
         }
-            #endregion
+        #endregion
 
-            #region Remove Member
-            public bool RemoveMember(int MemberId)
+        #region Remove Member
+        public bool RemoveMember(int MemberId)
             {
             var memberRepo = _uintOfWork.GetRepository<Member>();
             var Member = memberRepo.GetById(MemberId);
@@ -130,20 +166,25 @@ namespace GymMangementBLL.Services.Classes
             var MemberShips = memberShipsRepo.GetAll(x => x.MemberId == MemberId);
 
             try
+            {
+                if (MemberShips.Any())
                 {
-                if(MemberShips.Any())
-                {
-                    foreach(var membership in MemberShips)
+                    foreach (var membership in MemberShips)
                         memberShipsRepo.Delete(membership);
-                    
+
                 }
                 memberRepo.Delete(Member);
-                return _uintOfWork.SaveChanges() > 0;
-                }
-                catch
-                {
-         
-                    return false;
+                var IsDeleted = _uintOfWork.SaveChanges() > 0;
+                if (IsDeleted)
+                    _attachmentService.Delete(Member.Photo, "Members");
+
+                return IsDeleted;
+            }
+
+            catch
+            {
+
+                return false;
             }
             }
             #endregion
@@ -191,14 +232,6 @@ namespace GymMangementBLL.Services.Classes
                 return hasActiveMemberSessions;
             }
 
-        public IEnumerable<MemberViewModel> GetAllMembers()
-        {
-            var Members = _uintOfWork.GetRepository<Member>().GetAll() ?? [];
-            if (Members is null || !Members.Any()) return [];
-
-            var MemberViewModels = _mapper.Map<IEnumerable<MemberViewModel>>(Members);
-            return MemberViewModels;
-        }
 
         #endregion
 

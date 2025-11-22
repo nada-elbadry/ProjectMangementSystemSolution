@@ -1,4 +1,4 @@
-﻿using GymMangementBLL.ViewModels.PlanViewModels;
+﻿using GymMangementBLL.ViewModels.PlanViewModel;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -7,17 +7,14 @@ using System.Threading.Tasks;
 
 namespace GymMangementBLL.Services.Interfaces
 {
-    internal interface IPlanService
+    public interface IPlanService
     {
-        
 
-        IEnumerable<PlanViewModel>GetAllPlans();
 
-        PlanViewModel? GetPlanById(int PlanId);
-
+        IEnumerable<PlanViewModel> GetAllPlans();
+        PlanViewModel? GetPlanDetails(int PlanId);
         UpdatePlanViewModel? GetPlanToUpdate(int PlanId);
-
-        bool UpdatePlan(int PlanId, UpdatePlanViewModel updatedPlan);
+        bool UpdatePlan(int PlanId, UpdatePlanViewModel UpdatedPlan);
         bool ToggleStatus(int PlanId);
     }
 }

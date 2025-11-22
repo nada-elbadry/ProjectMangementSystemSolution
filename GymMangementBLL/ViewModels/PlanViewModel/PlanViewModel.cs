@@ -4,9 +4,9 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace GymMangementBLL.ViewModels.PlanViewModels
+namespace GymMangementBLL.ViewModels.PlanViewModel
 {
-    internal class PlanViewModel
+    public class PlanViewModel
     {
         public int Id { get; set; }
         public string Name { get; set; } = null!;

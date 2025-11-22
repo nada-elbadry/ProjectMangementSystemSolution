@@ -20,13 +20,11 @@ namespace GymMangementDAL.Data.Configurations
 
             builder.Property(x => x.Description)
                .HasColumnType("varchar")
-               .HasMaxLength(100);
+               .HasMaxLength(200);
 
             builder.Property(x => x.Price)
                .HasPrecision(10,2);
-             builder.Property(x => x.Name)
-                .HasColumnType("varchar")
-                .HasMaxLength(50);
+            
 
             builder.ToTable(Tb =>
             {

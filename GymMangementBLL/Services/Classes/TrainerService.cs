@@ -1,5 +1,6 @@
-﻿using GymMangementBLL.Services.Interfaces;
-using GymMangementBLL.ViewModels.TrainerViewModel;
+﻿using AutoMapper;
+using GymMangementBLL.Services.Interfaces;
+using GymMangementBLL.ViewModels.TrainerViewModels;
 using GymMangementDAL.Entities;
 using GymMangementDAL.Repositories.Classes;
 using GymMangementDAL.Repositories.Interfaces;
@@ -11,144 +12,151 @@ using System.Threading.Tasks;
 
 namespace GymMangementBLL.Services.Classes
 {
-    public class TrainerService : ITrainerService
+    public class TrainerService : ITrainerServices
     {
 
-        private readonly IUnitOfWork _unitOfWork;
+        #region Fields & Constructor
+        private readonly IUnitOfWork _uintOfWork;
+        private readonly IMapper _mapper;
 
-        public TrainerService(IUnitOfWork unitOfWork)
+        public TrainerService(IUnitOfWork uintOfWork, IMapper mapper)
         {
-            _unitOfWork = unitOfWork;
+            _uintOfWork = uintOfWork;
+            _mapper = mapper;
         }
-        public bool CreateTrainer(CreateTrainerViewModel createdTrainer)
+        #endregion
+
+        #region Get All Trainers
+        public IEnumerable<TrainerViewModel> GetAllTrainers()
+        {
+            var trainers = _uintOfWork.GetRepository<Trainer>().GetAll();
+            if (trainers is null || !trainers.Any())
+                return Enumerable.Empty<TrainerViewModel>();
+
+            return _mapper.Map<IEnumerable<TrainerViewModel>>(trainers);
+        }
+        #endregion
+
+        #region Create Trainer
+        // Fix typo: CreateTariner -> CreateTrainer
+        public bool CreateTrainer(CreateTrainerViewModel createTrainer)
         {
             try
             {
-                var Repo = _unitOfWork.GetRepository<Trainer>();
+                if (IsEmailExists(createTrainer.Email) || IsPhoneExists(createTrainer.Phone))
+                    return false;
 
-                if (IsEmailExists(createdTrainer.Email) || IsPhoneExists(createdTrainer.Phone)) return false;
-                var Trainer = new Trainer()
-                {
-                    Name = createdTrainer.Name,
-                    Email = createdTrainer.Email,
-                    Phone = createdTrainer.Phone,
-                    DateOfBirth = createdTrainer.DateOfBirth,
-                    Specialties = createdTrainer.Specialties,
-                    Gender = createdTrainer.Gender,
-                    Address = new Address()
-                    {
-                        BuildingNumber = createdTrainer.BuldingNumber,
-                        City = createdTrainer.City,
-                        Street = createdTrainer.Street,
-                    }
-                };
-
-
-                Repo.Add(Trainer);
-
-                return _unitOfWork.SaveChanges() > 0;
-
-
+                var trainer = _mapper.Map<Trainer>(createTrainer);
+                _uintOfWork.GetRepository<Trainer>().Add(trainer);
+                return _uintOfWork.SaveChanges() > 0;
             }
-            catch (Exception)
+            catch (Exception ex)
             {
+                Console.WriteLine($"--- CREATE TRAINER FAILED: {ex.Message} ---");
                 return false;
             }
         }
+        #endregion
 
-        public IEnumerable<TrainerViewModel> GetAllTrainers()
-        {
-            var Trainers = _unitOfWork.GetRepository<Trainer>().GetAll();
-            if (Trainers is null || !Trainers.Any()) return [];
-
-            return Trainers.Select(X => new TrainerViewModel
-            {
-                Id = X.Id,
-                Name = X.Name,
-                Email = X.Email,
-                Phone = X.Phone,
-             Specialization=X.Specialties.ToString()
-            });
-        }
-
+        #region Get Trainer Details
         public TrainerViewModel? GetTrainerDetails(int trainerId)
         {
-            var Trainer = _unitOfWork.GetRepository<Trainer>().GetById(trainerId);
-            if (Trainer is null) return null;
-
-
-            return new TrainerViewModel
-            {
-                Email = Trainer.Email,
-                Name = Trainer.Name,
-                Phone = Trainer.Phone,
-                Specialization =Trainer.Specialties.ToString()
-            };
+            var trainer = _uintOfWork.GetRepository<Trainer>().GetById(trainerId);
+            if (trainer is null) return null;
+            return _mapper.Map<TrainerViewModel>(trainer);
         }
-        public UpdateTrainerViewModel? GetTrainerToUpdate(int trainerId)
+        #endregion
+
+        #region Get Trainer To Update
+        public TrainerToUpdateViewModel? GetTrainerToUpdate(int trainerId)
         {
-            var Trainer = _unitOfWork.GetRepository<Trainer>().GetById(trainerId);
-            if (Trainer is null) return null;
-
-            return new UpdateTrainerViewModel()
-            {
-                Name = Trainer.Name, // For Display 
-                Email = Trainer.Email,
-                Phone = Trainer.Phone,
-                Street = Trainer.Address.Street,
-                BuildingNumber = Trainer.Address.BuildingNumber,
-                City = Trainer.Address.City,
-                Specialties = Trainer.Specialties
-            };
+            var trainer = _uintOfWork.GetRepository<Trainer>().GetById(trainerId);
+            if (trainer is null) return null;
+            return _mapper.Map<TrainerToUpdateViewModel>(trainer);
         }
+        #endregion
+
+        #region Update Trainer Details
+        // Use TrainerToUpdateViewModel
+        public bool UpdateTrainerDetails(int trainerId, TrainerToUpdateViewModel updateTrainer)
+        {
+            try
+            {
+                var repo = _uintOfWork.GetRepository<Trainer>();
+                var trainerToUpdate = repo.GetById(trainerId);
+                if (trainerToUpdate is null) return false;
+
+                // Check for duplicates using helper methods
+                if (IsEmailExists(updateTrainer.Email, trainerId) || IsPhoneExists(updateTrainer.Phone, trainerId))
+                {
+                    return false; // Email or phone taken by another trainer
+                }
+
+                _mapper.Map(updateTrainer, trainerToUpdate); // Map changes
+                trainerToUpdate.UpdatedAt = DateTime.Now; // Update timestamp
+
+                return _uintOfWork.SaveChanges() > 0;
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"--- UPDATE TRAINER FAILED: {ex.Message} ---");
+                return false;
+            }
+        }
+        #endregion
+
+        #region Remove Trainer
         public bool RemoveTrainer(int trainerId)
         {
-            var Repo = _unitOfWork.GetRepository<Trainer>();
+            var Repo = _uintOfWork.GetRepository<Trainer>();
             var TrainerToRemove = Repo.GetById(trainerId);
             if (TrainerToRemove is null || HasActiveSessions(trainerId)) return false;
             Repo.Delete(TrainerToRemove);
-            return _unitOfWork.SaveChanges() > 0;
+            return _uintOfWork.SaveChanges() > 0;
         }
-
-        public bool UpdateTrainerDetails(UpdateTrainerViewModel updatedTrainer, int trainerId)
-        {
-            var Repo = _unitOfWork.GetRepository<Trainer>();
-            var TrainerToUpdate = Repo.GetById(trainerId);
-
-            if (TrainerToUpdate is null || IsEmailExists(updatedTrainer.Email) || IsPhoneExists(updatedTrainer.Phone)) return false;
-
-            TrainerToUpdate.Email = updatedTrainer.Email;
-            TrainerToUpdate.Phone = updatedTrainer.Phone;
-            TrainerToUpdate.Address.BuildingNumber = updatedTrainer.BuildingNumber;
-            TrainerToUpdate.Address.Street = updatedTrainer.Street;
-            TrainerToUpdate.Address.City = updatedTrainer.City;
-            TrainerToUpdate.Specialties = updatedTrainer.Specialties;
-            TrainerToUpdate.UpdatedAt = DateTime.Now;
-            Repo.Update(TrainerToUpdate);
-            return _unitOfWork.SaveChanges() > 0;
-        }
+        #endregion
 
         #region Helper Methods
-
-        private bool IsEmailExists(string email)
+        public bool IsEmailExists(string Email)
         {
-            var existing = _unitOfWork.GetRepository<Member>().GetAll(
-                m => m.Email == email).Any();
-            return existing;
+            return _uintOfWork.GetRepository<Member>().GetAll(X => X.Email == Email).Any();
         }
 
-        private bool IsPhoneExists(string phone)
+        public bool IsPhoneExists(string Phone)
         {
-            var existing = _unitOfWork.GetRepository<Member>().GetAll(
-                m => m.Phone == phone).Any();
-            return existing;
+            return _uintOfWork.GetRepository<Member>().GetAll(X => X.Phone == Phone).Any();
         }
 
-        private bool HasActiveSessions(int Id)
+        public bool IsEmailExists(string Email, int memberIdToExclude)
         {
-            var activeSessions = _unitOfWork.GetRepository<Session>().GetAll(
-               s => s.TrainerId == Id && s.StartDate > DateTime.Now).Any();
-            return activeSessions;
+            return _uintOfWork.GetRepository<Member>()
+                .GetAll(X => X.Email == Email && X.Id != memberIdToExclude)
+                .Any();
+        }
+
+        public bool IsPhoneExists(string Phone, int memberIdToExclude)
+        {
+            return _uintOfWork.GetRepository<Member>()
+                .GetAll(X => X.Phone == Phone && X.Id != memberIdToExclude)
+                .Any();
+        }
+
+        // This method is correct and still needed
+        public bool HasActiveSessions(int MemberId)
+        {
+            var memberSessions = _uintOfWork.GetRepository<MemberSession>()
+                .GetAll(x => x.MemberId == MemberId)
+                .ToList();
+
+            if (!memberSessions.Any()) return false;
+
+            var sessionIds = memberSessions.Select(s => s.SessionId).ToList();
+
+            bool hasActiveMemberSessions = _uintOfWork.GetRepository<Session>()
+                .GetAll(x => sessionIds.Contains(x.Id) && x.StartDate > DateTime.Now)
+                .Any();
+
+            return hasActiveMemberSessions;
         }
         #endregion
     }

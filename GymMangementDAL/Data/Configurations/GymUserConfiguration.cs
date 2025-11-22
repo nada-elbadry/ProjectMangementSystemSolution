@@ -21,6 +21,9 @@ namespace GymMangementDAL.Data.Configurations
             builder.Property(x=> x.Email)
                 .HasColumnType("varchar")
                 .HasMaxLength(100);
+            builder.Property(X => X.Phone)
+                 .HasColumnType("varchar")
+                 .HasMaxLength(11);
 
             builder.ToTable(Tb =>
             {
